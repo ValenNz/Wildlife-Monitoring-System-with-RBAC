@@ -85,8 +85,8 @@
                 @php
                     $roleMap = [
                         1 => 'Administrator',
-                        2 => 'Konservasionis Lapangan',
-                        3 => 'Peneliti Ekologi',
+                        2 => 'Peneliti Ekologi',
+                        3 => 'Konservasionis Lapangan',
                         4 => 'Pengambil Keputusan'
                     ];
                     echo $roleMap[Auth::user()->role_id] ?? 'User';

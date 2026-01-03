@@ -22,4 +22,16 @@ class EnvironmentalData extends Model
     ];
 
     // ❌ Tidak ada relasi ke Device (alasan sama seperti TrackingData)
+// Relasi ke Device
+    public function device()
+    {
+        return $this->belongsTo(Device::class);
+    }
+
+    // Relasi ke Animal (via device)
+    public function animal()
+    {
+        return $this->hasOneThrough(Animal::class, Device::class);
+    }
+    
 }

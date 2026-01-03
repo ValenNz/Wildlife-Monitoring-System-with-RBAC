@@ -32,13 +32,12 @@ class TrackingData extends Model
     // ✅ Relasi ke Animal via Device (hasOneThrough)
     public function animal()
     {
-        return $this->hasOneThrough(
-            Animal::class,      // Target model
-            Device::class,      // Intermediate model
-            'device_id',        // Foreign key di Device (devices.device_id)
-            'id',               // Local key di Animal (animals.id)
-            'device_id',        // Foreign key di TrackingData (tracking_data.device_id)
-            'animal_id'         // Local key di Device (devices.animal_id)
-        );
+        return $this->hasOneThrough(Animal::class, Device::class);
+
+    }
+
+     public function environmentalData()
+    {
+        return $this->hasOne(EnvironmentalData::class, 'device_id', 'device_id');
     }
 }

@@ -11,9 +11,20 @@ class DeviceController extends Controller
 {
     /**
      * Display a listing of the devices.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
+        // 1. Validasi dan atur nilai per_page
+        $perPage = $request->get('per_page', '10');
+        $allowedPerPage = ['10', '100', '1000', 'all'];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = '10';
+        }
+
+        // 2. Bangun query dasar dengan JOIN ke animals
         $query = DB::table('devices as d')
             ->leftJoin('animals as a', 'd.animal_id', '=', 'a.id')
             ->select(
@@ -22,35 +33,54 @@ class DeviceController extends Controller
                 'd.status',
                 'd.battery_level',
                 'd.last_seen',
+                'd.installation_date',
                 'a.name as animal_name',
-                'a.species as species' // Ambil dari animals, bukan tabel species
+                'a.species as species'
             );
 
+        // 3. Terapkan filter pencarian
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('d.device_id', 'LIKE', "%{$request->search}%")
-                  ->orWhere('a.name', 'LIKE', "%{$request->search}%");
+                  ->orWhere('a.name', 'LIKE', "%{$request->search}%")
+                  ->orWhere('a.species', 'LIKE', "%{$request->search}%");
             });
         }
 
+        // 4. Terapkan filter status
         if ($request->filled('status')) {
             $query->where('d.status', $request->status);
         }
 
-        $perPage = $request->get('per_page', 10);
-        $devices = $query->paginate($perPage);
+        // 5. Ambil data berdasarkan pilihan per_page
+        if ($perPage === 'all') {
+            $devices = $query->get();
+            $paginatedDevices = null;
+            // Hitung total dari query asli sebelum get()
+            $deviceCount = $query->count();
+        } else {
+            $perPage = (int)$perPage;
+            $paginatedDevices = $query->paginate($perPage);
+            $devices = $paginatedDevices->items();
+            $deviceCount = $paginatedDevices->total();
+        }
 
+        // 6. Ambil statistik untuk card di atas
         $totalDevices = DB::table('devices')->count();
         $activeDevices = DB::table('devices')->where('status', 'active')->count();
         $inactiveDevices = DB::table('devices')->where('status', 'inactive')->count();
         $lowBatteryDevices = DB::table('devices')->where('battery_level', '<', 20)->count();
 
+        // 7. Kirim data ke view
         return view('devices.index', compact(
             'devices',
+            'paginatedDevices',
             'totalDevices',
             'activeDevices',
             'inactiveDevices',
-            'lowBatteryDevices'
+            'lowBatteryDevices',
+            'perPage',
+            'deviceCount'
         ));
     }
 
@@ -202,15 +232,24 @@ class DeviceController extends Controller
 
         $callback = function() use ($devices) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['Device ID', 'Animal', 'Species', 'Status', 'Battery Level (%)', 'Last Seen']);
+            fputcsv($file, [
+                'Device ID',
+                'Animal Name',
+                'Species',
+                'Status',
+                'Battery Level (%)',
+                'Installation Date',
+                'Last Seen'
+            ]);
 
             foreach ($devices as $device) {
                 fputcsv($file, [
                     $device->device_id,
                     $device->animal_name ?? 'Not assigned',
-                    $device->species_name ?? 'N/A',
+                    $device->species ?? 'N/A',
                     $device->status,
                     $device->battery_level,
+                    $device->installation_date ? $device->installation_date->format('Y-m-d') : 'N/A',
                     $device->last_seen ? $device->last_seen->format('Y-m-d H:i:s') : 'Never'
                 ]);
             }
@@ -219,5 +258,55 @@ class DeviceController extends Controller
         };
 
         return Response::stream($callback, 200, $headers);
+    }
+
+    /**
+     * Simulate a device test signal (FR-17: Notifikasi Teknis).
+     */
+    public function test($id, Request $request)
+    {
+        // Perbarui last_seen untuk simulasi sinyal diterima
+        DB::table('devices')
+            ->where('id', $id)
+            ->update(['last_seen' => now(), 'updated_at' => now()]);
+
+        // Simpan notifikasi ke tabel notifications (FR-17)
+        DB::table('notifications')->insert([
+            'title' => 'Device Test Successful',
+            'message' => "Test signal sent to device ID {$id}.",
+            'type' => 'info',
+            'is_read' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Test signal sent.']);
+    }
+
+    /**
+     * Reset device to factory settings (FR-08: Manajemen Perangkat).
+     */
+    public function reset($id, Request $request)
+    {
+        DB::table('devices')
+            ->where('id', $id)
+            ->update([
+                'status' => 'active',
+                'battery_level' => 100,
+                'last_seen' => now(),
+                'updated_at' => now(),
+            ]);
+
+        // Simpan notifikasi
+        DB::table('notifications')->insert([
+            'title' => 'Device Reset',
+            'message' => "Device ID {$id} has been reset to factory settings.",
+            'type' => 'warning',
+            'is_read' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return Redirect::back()->with('success', 'Device reset successfully!');
     }
 }

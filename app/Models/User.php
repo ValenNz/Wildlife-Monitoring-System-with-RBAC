@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Role;
+use App\Models\Permission;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB; // 🔥 Tambahkan ini!
 
 class User extends Authenticatable
@@ -21,17 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id', // ⚠️ Pastikan ini ada jika Anda pakai role_id
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
+        'role_id', // FK ke roles
+        'remember_token'
     ];
 
     /**
@@ -47,7 +40,6 @@ class User extends Authenticatable
         ];
     }
 
-    // ✅ Method perizinan (sudah benar secara logika)
     public function canAccess(string $permission): bool
     {
         if (!$this->role_id) {
@@ -60,4 +52,51 @@ class User extends Authenticatable
             ->where('permissions.name', $permission)
             ->exists();
     }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function permissions()
+    {
+        return $this->hasManyThrough(Permission::class, Role::class, 'id', 'role_id', 'role_id', 'id');
+    }
+
+    // Relasi ke Notifications (penerima)
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+    public function generatedReports()
+    {
+        return $this->hasMany(Report::class, 'generated_by');
+    }
+
+    public function assignedIncidents()
+        {
+            return $this->hasMany(Incident::class, 'assigned_to');
+        }
+
+        use Notifiable;
+
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
+    }
+
+    public function hasPermission($permissionName)
+    {
+        foreach ($this->roles as $role) {
+            foreach ($role->permissions as $permission) {
+                if ($permission->name === $permissionName) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

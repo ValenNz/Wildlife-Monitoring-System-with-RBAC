@@ -183,11 +183,16 @@
                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <input type="hidden" name="sort" value="{{ $sortBy }}">
                         <input type="hidden" name="order" value="{{ $sortOrder }}">
-                        <input type="hidden" name="per_page" value="{{ $perPage }}">
-                        <button type="submit" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg">Search</button>
+                        <select name="per_page" class="ml-2 px-2 py-2 border border-gray-300 rounded-lg text-sm">
+                            <option value="10" {{ $perPage == '10' ? 'selected' : '' }}>10</option>
+                            <option value="100" {{ $perPage == '100' ? 'selected' : '' }}>100</option>
+                            <option value="1000" {{ $perPage == '1000' ? 'selected' : '' }}>1000</option>
+                            <option value="all" {{ $perPage == 'all' ? 'selected' : '' }}>All</option>
+                        </select>
+                        <button type="submit" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Apply</button>
                     </form>
                     @if($search)
-                    <a href="{{ route('dashboard.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg">Clear</a>
+                    <a href="{{ route('dashboard.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm">Clear</a>
                     @endif
                 </div>
             </div>

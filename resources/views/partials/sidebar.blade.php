@@ -1,3 +1,4 @@
+<!-- DEBUG: Sidebar is being included -->
 <aside class="w-64 bg-gradient-to-b from-green-900 to-gray-800 text-white flex flex-col shadow-2xl">
     <!-- Logo & Brand -->
     <div class="p-6 border-b border-gray-700">
@@ -23,6 +24,7 @@
         </div>
 
         <!-- Dashboard -->
+       @if(auth()->check() && auth()->user()->canAccess('view_dashboard'))
         <a href="{{ route('dashboard.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('dashboard.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -32,9 +34,10 @@
             </svg>
             <span class="font-medium">Dashboard</span>
         </a>
+        @endif
 
         <!-- Live Map -->
-        @if(auth()->check() && auth()->user()->canAccess('view_map'))
+         @if(auth()->check() && auth()->user()->canAccess('view_map'))
         <a href="{{ route('map.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('map.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -47,39 +50,8 @@
         </a>
         @endif
 
-        <!-- Divider -->
-        <div class="pt-4 pb-2">
-            <p class="px-4 text-xs text-gray-400 uppercase tracking-wider font-semibold">Monitoring</p>
-        </div>
-
-        <!-- Devices -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_devices'))
-        <a href="{{ route('devices.index') }}"
-           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
-                  {{ request()->routeIs('devices.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
-            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('devices.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
-            </svg>
-            <span class="font-medium">Devices</span>
-        </a>
-        @endif
-
-        <!-- Geozones -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_geozones'))
-        <a href="{{ route('geozones.index') }}"
-           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
-                  {{ request()->routeIs('geozones.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
-            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('geozones.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-            </svg>
-            <span class="font-medium">Geozones</span>
-        </a>
-        @endif
-
         <!-- Historical Tracking -->
-        @if(auth()->check() && auth()->user()->canAccess('view_map'))
+         @if(auth()->check() && auth()->user()->canAccess('view_historical_tracking'))
         <a href="{{ route('historical-tracking.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('historical-tracking.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -92,7 +64,7 @@
         @endif
 
         <!-- Weather -->
-        @if(auth()->check() && auth()->user()->canAccess('view_weather'))
+         @if(auth()->check() && auth()->user()->canAccess('view_weather'))
         <a href="{{ route('weather.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('weather.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -104,13 +76,70 @@
         </a>
         @endif
 
-        <!-- Divider -->
+        <!-- Divider: Data Management -->
+        <div class="pt-4 pb-2">
+            <p class="px-4 text-xs text-gray-400 uppercase tracking-wider font-semibold">Data Management</p>
+        </div>
+
+        <!-- Animals -->
+         @if(auth()->check() && auth()->user()->canAccess('manage_animals'))
+        <a href="{{ route('animals.index') }}"
+           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
+                  {{ request()->routeIs('animals.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
+            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('animals.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M9 9H5m14-6V5a2 2 0 01-2 2H7a2 2 0 01-2-2V3"></path>
+            </svg>
+            <span class="font-medium">Animals</span>
+        </a>
+        @endif
+
+        <!-- Species -->
+         @if(auth()->check() && auth()->user()->canAccess('manage_species'))
+        <a href="{{ route('species.index') }}"
+           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
+                  {{ request()->routeIs('species.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
+            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('species.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M9 9H5m14-6V5a2 2 0 01-2 2H7a2 2 0 01-2-2V3"></path>
+            </svg>
+            <span class="font-medium">Species</span>
+        </a>
+        @endif
+
+        <!-- Devices -->
+         @if(auth()->check() && auth()->user()->canAccess('manage_devices'))
+        <a href="{{ route('devices.index') }}"
+           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
+                  {{ request()->routeIs('devices.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
+            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('devices.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+            </svg>
+            <span class="font-medium">Devices</span>
+        </a>
+        @endif
+
+        <!-- Geozones -->
+         @if(auth()->check() && auth()->user()->canAccess('manage_geozones'))
+        <a href="{{ route('geozones.index') }}"
+           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
+                  {{ request()->routeIs('geozones.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
+            <svg class="w-5 h-5 mr-3 {{ request()->routeIs('geozones.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+            </svg>
+            <span class="font-medium">Geozones</span>
+        </a>
+        @endif
+
+        <!-- Divider: Reports & Alerts -->
         <div class="pt-4 pb-2">
             <p class="px-4 text-xs text-gray-400 uppercase tracking-wider font-semibold">Reports & Alerts</p>
         </div>
 
         <!-- Notifications -->
-        @if(auth()->check() && auth()->user()->canAccess('view_notifications'))
+         @if(auth()->check() && auth()->user()->canAccess('view_notifications'))
         <a href="{{ route('notifications.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 relative
                   {{ request()->routeIs('notifications.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -125,7 +154,7 @@
         @endif
 
         <!-- Incidents -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_incidents'))
+         @if(auth()->check() && auth()->user()->canAccess('manage_incidents'))
         <a href="{{ route('incidents.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('incidents.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -138,7 +167,7 @@
         @endif
 
         <!-- Reports -->
-        @if(auth()->check() && auth()->user()->canAccess('view_reports'))
+         @if(auth()->check() && auth()->user()->canAccess('view_reports'))
         <a href="{{ route('reports.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('reports.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -151,7 +180,7 @@
         @endif
 
         <!-- Activity Logs -->
-        @if(auth()->check() && auth()->user()->canAccess('view_activity_logs'))
+         @if(auth()->check() && auth()->user()->canAccess('view_activity_logs'))
         <a href="{{ route('activity-logs.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('activity-logs.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -163,13 +192,13 @@
         </a>
         @endif
 
-        <!-- Divider -->
+        <!-- Divider: System -->
         <div class="pt-4 pb-2">
             <p class="px-4 text-xs text-gray-400 uppercase tracking-wider font-semibold">System</p>
         </div>
 
         <!-- Users -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_users'))
+         @if(auth()->check() && auth()->user()->canAccess('manage_users'))
         <a href="{{ route('users.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('users.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -182,7 +211,7 @@
         @endif
 
         <!-- Smart Integrations -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_smart'))
+         @if(auth()->check() && auth()->user()->canAccess('manage_smart_integrations'))
         <a href="{{ route('smart-integrations.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('smart-integrations.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -195,7 +224,7 @@
         @endif
 
         <!-- Backups -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_backups'))
+         @if(auth()->check() && auth()->user()->canAccess('manage_backups'))
         <a href="{{ route('backups.index') }}"
            class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200
                   {{ request()->routeIs('backups.*') ? 'bg-gradient-to-r from-blue-600 to-green-600 shadow-lg' : 'hover:bg-gray-700' }}">
@@ -207,18 +236,6 @@
         </a>
         @endif
 
-        <!-- Settings -->
-        @if(auth()->check() && auth()->user()->canAccess('manage_backups'))
-        <a href="#"
-           class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 hover:bg-gray-700">
-            <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-            <span class="font-medium">Settings</span>
-        </a>
-        @endif
     </nav>
 
     <!-- User Profile -->

@@ -9,8 +9,15 @@ class Notification extends Model
 {
     use HasFactory; // ← Tambahkan ini
     protected $fillable = [
-        'user_id', 'title', 'message', 'type',
-        'is_read', 'trigger_id', 'trigger_type'
+ 'user_id', // Penerima
+        'trigger_id', // ID entitas pemicu (animal, device, zone, dll)
+        'trigger_type', // Jenis entitas pemicu (App\Models\Animal, dll)
+        'type', // 'risk_zone_entry', 'device_alert'
+        'message',
+        'is_read',
+        'read_at',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
@@ -32,5 +39,20 @@ class Notification extends Model
             return TrackingData::find($this->trigger_id);
         }
         return null;
+    }
+
+    public function animal()
+    {
+        return $this->belongsTo(Animal::class, 'related_animal_id');
+    }
+
+    public function zone()
+    {
+        return $this->belongsTo(RiskZone::class, 'related_zone_id');
+    }
+
+    public function device()
+    {
+        return $this->belongsTo(TrackingData::class, 'related_device_id');
     }
 }

@@ -19,6 +19,11 @@ class Device extends Model
         return $this->belongsTo(Animal::class);
     }
 
+    public function trackingData()
+    {
+        return $this->hasMany(TrackingData::class);
+    }
+
     // ❌ TIDAK buat relasi ke TrackingData/EnvironmentalData
     // Karena data sangat besar → query langsung via model tersebut
 }

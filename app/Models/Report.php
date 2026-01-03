@@ -10,7 +10,8 @@ class Report extends Model
     use HasFactory; // ← Tambahkan ini
     protected $fillable = [
         'title', 'content', 'report_type', 'generated_by',
-        'generated_at', 'period_start', 'period_end', 'metadata'
+        'generated_at', 'period_start', 'period_end', 'metadata',        'output_format', // 'pdf', 'csv', 'geojson'
+        'generated_for_user_id' // Penerima laporan
     ];
 
     protected $casts = [
@@ -25,4 +26,11 @@ class Report extends Model
     {
         return $this->belongsTo(User::class, 'generated_by');
     }
+
+    // Relasi ke User (penerima)
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'generated_for_user_id');
+    }
+    
 }
